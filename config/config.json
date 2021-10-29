@@ -1,0 +1,19 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "desk-booking-tool-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/deskBookingTool/DeskBookingToolWebPart.js",
+          "manifest": "./src/webparts/deskBookingTool/DeskBookingToolWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "DeskBookingToolWebPartStrings": "lib/webparts/deskBookingTool/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js"
+  }
+}
