@@ -126,6 +126,19 @@ font-family: "Cambria";
   font-family: "Cambria";
 }
 
+.ProceedButton
+{
+
+  height: 38px;
+  width: 80px;
+  background-color: $ms-color-themePrimary;
+  color: $ms-color-white;
+  font-size: medium;
+  font-family: "Cambria";
+ 
+
+}
+
 .coststyle
 
 {
@@ -150,6 +163,11 @@ background-color:lightgrey;
 .commonstyle
 {
 
+  a
+  {
+
+    color: black !important;
+  }
   font-family: "Cambria";
   font-size: medium;
   width:50%;
@@ -157,6 +175,9 @@ background-color:lightgrey;
   //padding-left:18px;
 
 }
+
+
+
 
 .commonstyleDescRightbox
 {
@@ -294,6 +315,42 @@ font-weight: bold;
 .tableborder
 {
 
+  .tablecell {border: 1px solid black; text-align: center;
+  
+    font-family: Cambria;
+    font-size: medium;
+    font-weight: bold;
+  
+  
+  }
+
+  
+
+
+  .tablecelldata{padding: 5px;
+    height: 40px;
+    border: 0.5px solid black;
+    border-radius: 0px;
+    font-family: Cambria;
+    font-size: medium;
+    
+  
+  }
+
+
+  .tablecelldata1{padding: 5px;
+    height: 40px;
+    border: 0.5px solid black;
+    border-radius: 0px;
+    font-family: Cambria;
+    font-size: medium;
+    text-align: center;
+    
+  
+  }
+
+
+
 
   border: 1px solid black;
   border-collapse: collapse;
@@ -303,3 +360,174 @@ font-weight: bold;
     border-bottom: thick;
     border-top: thick;
 }
+
+
+
+.smallBox::before
+{
+  content:".";
+  width:15px;
+  height:15px;
+  float:left;
+  margin-right:10px;
+}
+.greenBox::before
+{
+  content:"";
+  background:darkgreen;
+}
+
+.redClass input[type=checkbox]
+{
+
+  background-color:red;
+
+}
+
+.normalClass input[type=checkbox]
+{
+
+  
+  background-color: gray;
+}
+
+.normalClass input[type=checkbox]:checked
+{
+
+  background:green;
+}
+
+.Iconbutton {
+  // Our button
+  text-decoration: none;
+  height: 38px;
+
+  // Primary Button
+  width: 80px;
+  
+  color: black;
+
+  // Basic Button
+  outline: transparent;
+  position: relative;
+  font-family: Cambria;
+  -webkit-font-smoothing: antialiased;
+  font-size: $ms-font-size-m;
+  font-weight: $ms-font-weight-regular;
+  border-width: 0;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 16px;
+
+  .label {
+    font-weight: $ms-font-weight-semibold;
+    font-size: medium;
+    height: 32px;
+    line-height: 32px;
+    margin: 0 4px;
+    vertical-align: top;
+    display: inline-block;
+  }
+
+ 
+}
+
+.chkboxDeactive{
+
+   
+
+  div {
+
+    background-color: red !important;
+  
+ } 
+
+
+}
+
+.chkboxActive{
+
+   
+
+  div {
+
+    background-color: gray !important;
+  
+ } 
+
+
+}
+
+.chkboxActive:is-checked {
+
+   
+
+  div {
+
+    background-color: green !important;
+  
+ } 
+
+
+}
+
+.resevedSeats1 {
+
+  div {
+
+  background-color:darkgreen !important;
+  font-weight: bold;
+  font-family: Cambria;
+  font-size: medium;
+  
+
+  }
+
+}
+
+.resevedSeats {
+
+  div {
+
+  background-color: red !important;
+  font-weight: bold;
+  font-family: Cambria;
+  font-size: medium;
+  
+
+  }
+
+}
+
+.emptySeats {
+
+  div {
+
+  background-color: gray !important;
+  font-weight: bold;
+  font-family: Cambria;
+  font-size: medium;
+  
+
+  }
+
+}
+
+.headings {
+
+  font-family: Cambria;
+  font-size: medium;
+  font-weight: bold;
+  
+  
+}
+
+.MyStyling
+{
+
+  display: flex;
+  flex-flow: row wrap;
+}
+
+
