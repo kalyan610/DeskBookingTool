@@ -172,16 +172,22 @@ public async BookedSeats(MyFloorLevel:string,MyBookingType:string,MyStartDate: s
 
   var strbookingsts='cancelled';
 
-  alert(MyFloorLevel);
+  
 
   let  BookedSeatsListItems = [];
 
   let FilterBokkedSeats: any = "(BookingStatus  ne '" + strbookingsts + "') and (BookingType eq '" + MyBookingType + "')   and (FloorLevel eq '" + MyFloorLevel + "')  and ((EventDate ge datetime'" + MyStartDate + "' and   EventDate le datetime'" + MyEndDate + "') or (EventDate le datetime'" + MyStartDate + "' and EndDate ge datetime'" + MyStartDate + "' ))";
 
+
+
+  //let FilterBokkedSeats: any = "(BookingStatus  ne '" + strbookingsts + "') and (BookingType eq '" + MyBookingType + "')   and (FloorLevel eq '" + MyFloorLevel + "')";
+
+  //let FilterBokkedSeats: any = "(BookingStatus  ne '" + strbookingsts + "') and (BookingType eq '" + MyBookingType + "')   and (FloorLevel eq '" + MyFloorLevel + "')";
+
   try
   {
     
- return await sp.web.lists.getByTitle("ConferenceRoomDetatils").items.select('DeskId').filter(FilterBokkedSeats).get().then(function (data) {
+ return await sp.web.lists.getByTitle("BookingData").items.select('DeskId').filter(FilterBokkedSeats).get().then(function (data) {
 
 
   for(let count=0;count<data.length;count++)
@@ -258,7 +264,7 @@ public async GetUrls(MyUrl: string):Promise<string>
    {
 
     
-    return await sp.web.lists.getByTitle("Locations").items.select('Title').get().then(function (data) {
+    return await sp.web.lists.getByTitle("GlobalLocations").items.select('Title').get().then(function (data) {
 
       return data;
 
@@ -274,7 +280,7 @@ public async GetUrls(MyUrl: string):Promise<string>
 
     let filtercondition: any = "(Title eq '" + SelLocVal + "')";
 
-    return await  sp.web.lists.getByTitle("CountriesDetails").items.select('BulidingName').filter(filtercondition).get().then(function (data) {
+    return await  sp.web.lists.getByTitle("GlobalBuildings").items.select('BulidingName').filter(filtercondition).get().then(function (data) {
 
     return data;
 
@@ -288,7 +294,7 @@ public async GetUrls(MyUrl: string):Promise<string>
 
     let filtercondition: any = "(Title eq '" + LocaVal + "') and (BuildingName eq '" + BuildNamVal + "')";
 
-    return await sp.web.lists.getByTitle("BookingInformation").items.select('BookingType').filter(filtercondition).get().then(function (data) {
+    return await sp.web.lists.getByTitle("GlobalBuildingsandBookingTypes").items.select('BookingType').filter(filtercondition).get().then(function (data) {
 
     return data;
 
@@ -301,7 +307,7 @@ public async GetUrls(MyUrl: string):Promise<string>
 
     let filtercondition: any = "(Title eq '" + LocaVal + "') and (BuildingName eq '" + BuildNamVal + "') and (BookingType eq '" + BookingTypeval + "')";
 
-    return await sp.web.lists.getByTitle("BookingandFloorDetails").items.select('FloorLevel').filter(filtercondition).get().then(function (data) {
+    return await sp.web.lists.getByTitle("GlobalFloorLevelDetails").items.select('FloorLevel').filter(filtercondition).get().then(function (data) {
 
     return data;
 
@@ -343,7 +349,7 @@ public async getCurrentUser(): Promise<any> {
 
 private async Save(MyLocation:string,MyBuildingName:string,MyBookingType:string,MyFloorLevel:string,MyStartDate: string,MyEndDate:string,MYDeskId:string,MyEmail:string,MyTitle:string):Promise<any>     {       
   
-  await sp.web.lists.getByTitle('ConferenceRoomDetatils').items.add({       
+  await sp.web.lists.getByTitle('BookingData').items.add({       
     
     Location:MyLocation,
     BuildingName:MyBuildingName,
@@ -361,6 +367,57 @@ private async Save(MyLocation:string,MyBuildingName:string,MyBookingType:string,
 
 }
 
+//region Test
+
+private async onDrop(MyLocation:string,MyBuildingName:string,MyBookingType:string,MyFloorLevel:string,MyStartDate: string,MyEndDate:string,MYDeskId:string,MyEmail:string,MyTitle:string)  {
+
+  
+
+  try
+  {
+ 
+    let Varmyval= await sp.web.lists.getByTitle("BookingData").items.add({
+
+    Location:MyLocation,
+    BuildingName:MyBuildingName,
+    BookingType:MyBookingType,
+    FloorLevel:MyFloorLevel,
+    EventDate:MyStartDate,            
+    EndDate:MyEndDate,
+    NumStatus:'2',
+    BookingStatus:'Booked',
+    DeskId:MYDeskId,
+    Email:MyEmail,
+    Title:MyTitle
+     
+    
+
+  }).then (async r => {
+    
+  
+  })
+
+
+
+  
+  return Varmyval;
+
+  
+}
+
+catch (error) {
+  console.log(error);
+}
+
+
+
+}
+
+
+
+
+//End
+
 
 
 
@@ -371,7 +428,13 @@ public async GetPDFLinks1(MyBuilding:string,MyBookingType:string,MyFloorLevel:st
 
    return await sp.web.lists.getByTitle("FloorPlans").items.select('URL').filter(filtercondition).get().then(function (data) {
 
+    if(data[0] && data[0].URL) 
+
     return data[0].URL;
+
+    else
+
+    return "";
   
   });
 
@@ -385,7 +448,14 @@ public async GetDeskDesc(MyDeskID:string):Promise<any>
 
   return await sp.web.lists.getByTitle("SeatsDescription").items.select('SeatNumber','Description').filter(filtercondition).get().then(function (data) {
 
+  if(data[0] && data[0].Description) 
+
   return data[0].Description;
+
+  else
+
+  return "";
+  
   
   });
 
