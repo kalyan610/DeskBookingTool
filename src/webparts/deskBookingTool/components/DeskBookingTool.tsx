@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import styles from './DeskBookingTool.module.scss';
 import { IDeskBookingToolProps } from './IDeskBookingToolProps';
 import { escape } from '@microsoft/sp-lodash-subset';
@@ -15,27 +16,48 @@ import "@pnp/sp/fields";
 import "@pnp/sp/attachments";
 import "@pnp/sp/files";
 
+//import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
+
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 
-import { Grid, Checkbox, Paper, Table, ModalManager } from '@material-ui/core';
+import { Grid, Paper, Table, ModalManager } from '@material-ui/core';
 
 import {
-  TextField,
-  Stack, IDropdownOption, Dropdown, IDropdownStyles,Link,
-  IStackStyles, DatePicker, PrimaryButton, Label, getHighContrastNoAdjustStyle, IconButton, IStackTokens, StackItem
+  TextField,ICheckboxStyles,IChoiceGroupOption,ChoiceGroup,
+  Stack, IDropdownOption, Dropdown, IDropdownStyles,Link,IconButton,Checkbox,
+  IStackStyles, DatePicker, PrimaryButton, Label, getHighContrastNoAdjustStyle, IStackTokens, StackItem
 } from '@fluentui/react';
 
 
-import { DateTimePickerComponent, DateTimePicker } from '@syncfusion/ej2-react-calendars';
 
 
-
+import { DateTimePickerComponent } from '@syncfusion/ej2-react-calendars';
 
 
 const sectionStackTokens: IStackTokens = { childrenGap: 10 };
+const sectionStackTokens1: IStackTokens = { childrenGap: 5 };
 const stackTokens = { childrenGap: 80 };
 const stackStyles: Partial<IStackStyles> = { root: { padding: 10 } };
 const stackButtonStyles: Partial<IStackStyles> = { root: { Width: 20 } };
+
+const RadioExp: IChoiceGroupOption[] = 
+
+[  { key: "Yes", text: "Yes" , },  { key: "No", text: "No" },];  
+
+const Radio14Days: IChoiceGroupOption[] = 
+
+[  { key: "Yes", text: "Yes" , },  { key: "No", text: "No" },];  
+
+const RadioClose: IChoiceGroupOption[] = 
+
+[  { key: "Yes", text: "Yes" , },  { key: "No", text: "No" },];  
+
+const RadioTestPos: IChoiceGroupOption[] = 
+
+[  { key: "Yes", text: "Yes" , },  { key: "No", text: "No" },];  
+
 
 let GeneralDeskLists = [];
 let FixedDeskLists = []
@@ -56,10 +78,33 @@ let UserNameCollection=[];
 let AllCheckedItems: any = [];
 var AllDelrecordIds: any = [];
 
+//const [selectedDate, handleDateChange] = useState(new Date());
+
 
 const dropdownStyles: Partial<IDropdownStyles> = {
   dropdown: { width: 300 },
+  
+
 };
+
+
+
+let checkboxstyles: ICheckboxStyles = { 
+  root: { 
+    marginTop: '10px',  
+    
+    paddingTop: '10px',  
+    paddingBottom: '10px',  
+    paddingLeft: '10px'  
+  }, 
+  checkmark: { 
+
+    backgroundColor:'green'
+  } 
+}; 
+
+
+
 
 const options: IDropdownOption[] = [
 
@@ -73,6 +118,9 @@ const options: IDropdownOption[] = [
 
   ];
 
+ 
+  
+
 
 
 export interface IDeskBookingFieldsState {
@@ -81,6 +129,7 @@ export interface IDeskBookingFieldsState {
   MyBookingTypeVal: any;
   MyFloorType: any;
   flag: boolean;
+  procflag:boolean;
   StartDate: any;
   EndDate: any;
   BlockCount: number;
@@ -113,6 +162,13 @@ export interface IDeskBookingFieldsState {
   SelDeskreqsId:any;
   DefalSelcarray:any;
   Userboolval:boolean;
+  Exp:any;
+  MyDays:any;
+  Closekey:any;
+  QuestKey:any;
+  isDisable:boolean;
+  FirstDivVisble:boolean;
+
 }
 
 export default class DeskBookingTool extends React.Component<IDeskBookingToolProps, IDeskBookingFieldsState> {
@@ -132,6 +188,7 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
       MyBookingTypeVal: null,
       MyFloorType: null,
       flag: false,
+      procflag:false,
       NoofSeats: null,
       StartDate: null,
       EndDate: null,
@@ -163,12 +220,19 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
      DeskDesc:"",
      SelDeskreqsId:"",
      DefalSelcarray:[],
-     Userboolval:false
+     Userboolval:false,
+     Exp:"",
+     MyDays:"",
+     Closekey:"",
+     QuestKey:"",
+     isDisable:true,
+     FirstDivVisble:true
+     
 
     };
 
 
-    alert(this.props.url);
+    
 
     RootUrl = this.props.url;
 
@@ -180,6 +244,8 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     this.getUserDetails();
 
+    alert('five');
+    
     
 
   }
@@ -190,6 +256,8 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
   private GetStartDateandEndDate()
   {
+
+    
 
     let StartAM='9:00 AM'
     let EndPm='5:00 PM'
@@ -218,9 +286,9 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
     
 
     let now2=new Date();
-    now2.setDate(now2.getDate()-1)
+    now2.setDate(now2.getDate())
 
-    let day2 = ("2" + now2.getDate()).slice(-2);
+    let day2 = (now2.getDate());
 
     let month2=("0" + (now2.getMonth() + 1)).slice(-2);
 
@@ -345,7 +413,7 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     let MyUrl = await this.GlobalService.GetUrls(this.state.Mylocationval);
 
-    alert(MyUrl);
+    //alert(MyUrl);
 
     this._service = new Service(MyUrl, this.props.context);
 
@@ -354,15 +422,67 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     for (let grpcount = 0; grpcount < mycurgroup.length; grpcount++) {
 
+      if(this.state.Mylocationval=='Canada')
+      {
 
-      if (mycurgroup[grpcount].Title == 'DeskAdmins') {
+        if (mycurgroup[grpcount].Title == 'FixedDeskUsersCanada')
+        {
+          this.setState({ userExsits: true });
 
-        this.setState({ userExsits: true });
+        }
+
+      }
+
+      if(this.state.Mylocationval=='Brazil')
+      {
+
+        if (mycurgroup[grpcount].Title == 'FixedDeskUsersBrazil')
+        {
+          this.setState({ userExsits: true });
+
+        }
+
+      }
+
+      if(this.state.Mylocationval=='Orlando')
+      {
+
+        if (mycurgroup[grpcount].Title == 'FixedDeskUsersOrlando')
+        {
+          this.setState({ userExsits: true });
+
+        }
+
+      }
+
+      if(this.state.Mylocationval=='NewYork')
+      {
+
+        if (mycurgroup[grpcount].Title == 'FixedDeskUsersNewYork')
+        {
+          this.setState({ userExsits: true });
+
+        }
+
+      }
+
+      if(this.state.Mylocationval=='Charlotte')
+      {
+
+        if (mycurgroup[grpcount].Title == 'FixedDeskUsersCharlotte')
+        {
+          this.setState({ userExsits: true });
+
+        }
 
       }
 
 
-      //END
+
+
+
+
+   //END
     }
 
 
@@ -373,11 +493,21 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     var data = await this._service.MyGetBookingType(LocaVal, BuildNamVal);
 
+    let BookingLevel;
+
+    let arr :any=[];
+
     var AllBookings: any = [];
 
-    let BookingLevel = data[0].BookingType;
+    for( var count in  data)
+    {
 
-    let arr = BookingLevel.split(',')
+     BookingLevel = data[count].BookingType;
+
+     arr = BookingLevel.split(',')
+
+    }
+    
 
     for (var k in arr) {
 
@@ -392,7 +522,7 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
       if(this.state.userExsits==false)
       {
 
-        if(arr[k]!='FixedDesk')
+        if(arr[k]!='Fixed Desk')
         {
 
 
@@ -584,14 +714,14 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
   private OnBtnClick(): void {
 
-    if (this.state.Mylocationval == null || this.state.Mylocationval == 'Select an Location' || this.state.Mylocationval == 'Select') {
+    if (this.state.Mylocationval == null || this.state.Mylocationval == 'Select Location' || this.state.Mylocationval == 'Select') {
 
       alert('please select location');
       this.setState({ flag: false });
 
     }
 
-    else if (this.state.MyBuildingVal == null || this.state.MyBuildingVal == 'Select an Building' || this.state.MyBuildingVal == 'Select') {
+    else if (this.state.MyBuildingVal == null || this.state.MyBuildingVal == 'Select Building' || this.state.MyBuildingVal == 'Select') {
 
       alert('please select Building');
       this.setState({ flag: false });
@@ -599,7 +729,7 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
     }
 
 
-    else if (this.state.MyBookingTypeVal == null || this.state.MyBookingTypeVal == 'Select an BookingType' || this.state.MyBookingTypeVal == 'Select') {
+    else if (this.state.MyBookingTypeVal == null || this.state.MyBookingTypeVal == 'Select BookingType' || this.state.MyBookingTypeVal == 'Select') {
 
       alert('please select BookingType');
       this.setState({ flag: false });
@@ -607,7 +737,7 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
     }
 
 
-    else if (this.state.MyFloorType == null || this.state.MyFloorType == 'Select an FloorLevel' || this.state.MyFloorType == 'Select') {
+    else if (this.state.MyFloorType == null || this.state.MyFloorType == 'Select  FloorLevel' || this.state.MyFloorType == 'Select') {
 
       alert('please select FloorLevel');
       this.setState({ flag: false });
@@ -691,11 +821,11 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
         let  MyHyperlink= await this._service.GetPDFLinks1(MyBuild,MyBookingType,MyFloorLevel);
 
-
+        
 
         this.setState({LinkFloor:MyHyperlink});
 
-        alert(this.state.LinkFloor);
+        
 
         TotalSeatsList = await this._service.TotalNoofSeats(MyFloorLevel, MyBookingType);
 
@@ -819,6 +949,10 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
     this.setState({Dispalygrid:false});
 
     this.setState({GridUserValues:[]});
+
+    AllCheckedItems=[];
+
+
 
   }
 
@@ -1025,11 +1159,21 @@ private clear():void{
 
       let MyTilte=this.state.Mylocationval + "-" +this.state.GridUserValues[count].UserName + "-" +this.state.MyFloorType 
 
-      this._service.Save(this.state.Mylocationval,this.state.MyBuildingVal,this.state.MyBookingTypeVal,this.state.MyFloorType,this.state.StartDate,this.state.EndDate,this.state.GridUserValues[count].DeskId,this.state.GridUserValues[count].UserEmail,MyTilte);
+      this._service.onDrop(this.state.Mylocationval,this.state.MyBuildingVal,this.state.MyBookingTypeVal,this.state.MyFloorType,this.state.StartDate,this.state.EndDate,this.state.GridUserValues[count].DeskId,this.state.GridUserValues[count].UserEmail,MyTilte).then(function (data)
+      {
+
+     
+     window.location.replace("https://capcoinc.sharepoint.com/sites/Global-Capco-Desk-Reservations/");
+
+      });
+
+     
 
     }
 
-    alert('Submitted Succefully');
+    alert('Submitted Successfully');
+
+    
   }
 
 
@@ -1058,7 +1202,7 @@ private clear():void{
 
      console.log(data.target.value);
 
-     let SelDeskId=data.target.value;
+     let SelDeskId=data.target.attributes["aria-label"].value;
 
      let Checkstatusval=data.target.checked;
 
@@ -1068,11 +1212,17 @@ private clear():void{
 
     this._service = new Service(MyUrl2, this.props.context);
 
+    
     let DeskDescprtion= await this._service.GetDeskDesc(SelDeskId);
+    
 
     console.log(DeskDescprtion);
-    
+
+    if(DeskDescprtion!=null)
+    {
     this.setState({DeskDesc:DeskDescprtion});
+
+    }
 
     //END
 
@@ -1082,16 +1232,7 @@ private clear():void{
     if(Checkstatusval==true)
     {
 
-      if(this.state.GridUserValues.length==0)
-      {
-
-        alert(this.state.UserLoginName);
-
-
-
-        
-      }
-
+     
       AllCheckedItems.push({ key: SelDeskId, text: SelDeskId });
 
     
@@ -1101,11 +1242,11 @@ private clear():void{
   {
 
     
-  for(var count=0;count<AllCheckedItems.length;count++)
-	{
+  //for(var count=0;count<AllCheckedItems.length;count++)
+	//{
 
     AllCheckedItems.splice(AllCheckedItems.indexOf(SelDeskId), 1);
-  }
+  //}
 
   }
 
@@ -1120,6 +1261,157 @@ private clear():void{
     return dt.toISOString();
   }
 
+
+//Radio Events
+
+
+public ChangeExp=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): Promise<void>=> {  
+
+  this.setState({  
+
+    Exp: option.key  
+
+    });  
+
+    if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
+    {
+
+
+      this.setState({  
+
+        isDisable: false
+    
+        });  
+
+    }
+
+    else
+    {
+      this.setState({  
+
+        isDisable: true
+    
+        }); 
+
+    }
+
+  }
+
+  public Change14days=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): Promise<void>=> {  
+
+    this.setState({  
+  
+      MyDays: option.key  
+  
+      });  
+
+      if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
+      {
+  
+        this.setState({  
+
+          isDisable: false
+      
+          });  
+      }
+
+      else
+      {
+        this.setState({  
+
+          isDisable: true
+      
+          }); 
+
+      }
+  
+    }
+
+    public ChangeClose=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): Promise<void>=> {  
+
+      this.setState({  
+    
+        Closekey: option.key  
+    
+        });  
+
+        if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
+        {
+    
+          this.setState({  
+
+            isDisable: false
+        
+            });  
+        }
+
+        else
+        {
+          this.setState({  
+
+            isDisable: true
+        
+            }); 
+
+        }
+    
+      }
+
+      public ChangeQuestions=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGroupOption): Promise<void>=> {  
+
+        this.setState({  
+      
+          QuestKey: option.key  
+      
+          });  
+
+          if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No')
+          {
+      
+            this.setState({  
+
+              isDisable: false
+          
+              });  
+      
+          }
+
+
+          else
+          {
+            this.setState({  
+
+              isDisable: true
+          
+              }); 
+
+          }
+
+      
+        }
+
+
+        private OnBtnProcClick() :void {
+
+          this.setState({  
+      
+            procflag:true,
+            FirstDivVisble:false
+        
+            });  
+
+        }
+
+        private OnBtnCancelClick() :void {
+
+
+          window.location.replace("https://capcoinc.sharepoint.com/sites/Global-Capco-Desk-Reservation");
+        }
+
+//End
+
+
+
   public render(): React.ReactElement<IDeskBookingToolProps> {
 
 
@@ -1127,43 +1419,116 @@ private clear():void{
 
 
       <Stack tokens={stackTokens} styles={stackStyles}>
+      {this.state.flag == false && this.state.FirstDivVisble==true &&
+       <Stack>
+      <label className={styles.headings}>1. Are you experiencing any of the below symptoms?</label>
+      <br></br>
+      <label className={styles.headings}>a. Fever and/or chills</label>
+      <br></br>
+      <label className={styles.headings}>b. Cough</label>
+      <br></br>
+      <label className={styles.headings}>c. Shortness of breath</label>
+      <br></br>
+      <label className={styles.headings}>d. Decrease or loss of taste/ smell</label>
+      <br></br>
+      <label className={styles.headings}>e. Muscle aches/ joint pain</label>
+      <br></br>
+      <label className={styles.headings}>f. Extreme tiredness</label>
+      <br></br>
+       <ChoiceGroup className={styles.onlyFont} options={RadioExp} onChange={this.ChangeExp}/>
+       <br></br>
+       <label className={styles.headings}>2. In the last 14 days, have you travelled outside of Canada and been told to quarantine (per the federal quarantine requirements)?</label>
+       <br></br>
+       <ChoiceGroup className={styles.onlyFont} options={Radio14Days} onChange={this.Change14days}/>
+       <br></br>
+       <label className={styles.headings}>3. Have you been in close contact with someone who is sick in the past 14 days?</label>
+       <br></br>
+       <ChoiceGroup className={styles.onlyFont} options={RadioClose}  onChange={this.ChangeClose}/>
+       <br></br>
+       <label className={styles.headings}>4. Have you tested positive for COVID-19 in the past 14 days?</label>
+       <br></br>
+       <ChoiceGroup className={styles.onlyFont} options={RadioTestPos} onChange={this.ChangeQuestions}/>
+       <br></br>
+       <label className={styles.headings}>If you have answered YES to any of these questions, please DO NOT ENTER the office. Please stay at home and self-isolate. Contact Telehealth or your health provider to find out how to proceed.</label>
+       <br></br>
+       <Stack horizontal tokens={sectionStackTokens}>
+        <StackItem>
+        <PrimaryButton disabled={this.state.isDisable} text="Proceed" styles={stackButtonStyles} className={styles.ProceedButton} onClick={this.OnBtnProcClick.bind(this)}/>
+       </StackItem>
+       <StackItem>
+       <PrimaryButton text="Cancel" onClick={this.OnBtnCancelClick.bind(this)} styles={stackButtonStyles} className={styles.button} />
+       </StackItem>
+       </Stack>
+       
 
-        {this.state.flag == false &&
+  
+      </Stack>
+
+      }
+
+
+        {this.state.flag == false && this.state.procflag==true &&
           <Stack>
-            <b><div>Location</div></b><br></br>
-            <Dropdown placeHolder="Select an Location" options={this.state.LocationListItems} styles={dropdownStyles} selectedKey={this.state.Mylocationval ? this.state.Mylocationval : undefined} onChange={this.handleChangeLocation.bind(this)} /><br></br>
-           <b><div>Building</div></b><br></br>
-            <Dropdown placeHolder="Select an Building" options={this.state.BuildingListItems} styles={dropdownStyles} selectedKey={this.state.MyBuildingVal ? this.state.MyBuildingVal : undefined} onChange={this.handleChangeBuilding.bind(this)} /><br></br>
-            <b><div>Booking Type</div></b><br></br>
-            <Dropdown placeHolder="Select an BookingType" options={this.state.BookingListItems} styles={dropdownStyles} selectedKey={this.state.MyBookingTypeVal ? this.state.MyBookingTypeVal : undefined} onChange={this.handleChangeBookingType.bind(this)} /><br></br>
-            <b><div>Floor Level</div></b><br></br>
-            <Dropdown placeHolder="Select an FloorLevel" options={this.state.FloorListItems} styles={dropdownStyles} selectedKey={this.state.MyFloorType ? this.state.MyFloorType : undefined} onChange={this.handleChangeFloorLevel.bind(this)} /><br></br>
+
+            {/* StartAM */}
+
+            {/* <DatePicker
+
+                    onChange={this.handlestartDateChange}
+
+                    selected={this.state.StartDate}
+
+                    showTimeSelect
+
+                    dateFormat="MM/dd/yyyy   HH:mm a"
+
+                /> */}
+
+
+            {/* END */}
+    
+
+
+
+            {/* <b><div className={styles.headings}>Location</div></b> */}
+            <label className={styles.headings}>Location</label>
+            <br></br>
+            <Dropdown placeHolder="Select Location" options={this.state.LocationListItems} className={styles.headings} styles={dropdownStyles} selectedKey={this.state.Mylocationval ? this.state.Mylocationval : undefined} onChange={this.handleChangeLocation.bind(this)} /><br></br>
+            <label className={styles.headings}>Building</label><br></br>
+            <Dropdown placeHolder="Select Building" options={this.state.BuildingListItems} styles={dropdownStyles} selectedKey={this.state.MyBuildingVal ? this.state.MyBuildingVal : undefined} onChange={this.handleChangeBuilding.bind(this)} /><br></br>
+            <label className={styles.headings}>Booking Type</label><br></br>
+            <Dropdown placeHolder="Select Booking Type" options={this.state.BookingListItems} styles={dropdownStyles} selectedKey={this.state.MyBookingTypeVal ? this.state.MyBookingTypeVal : undefined} onChange={this.handleChangeBookingType.bind(this)} /><br></br>
+            <label className={styles.headings}>Floor Level</label><br></br>
+            <Dropdown placeHolder="Select Floor Level" options={this.state.FloorListItems} styles={dropdownStyles} selectedKey={this.state.MyFloorType ? this.state.MyFloorType : undefined} onChange={this.handleChangeFloorLevel.bind(this)} /><br></br>
             <PrimaryButton text="Next" onClick={this.OnBtnClick.bind(this)} styles={stackButtonStyles} className={styles.button} />
             </Stack>
 
         }
 
 
-        {this.state.flag == true &&
+        {this.state.flag == true && this.state.procflag &&
           <Stack className={styles.dateTimeClass}>
 
             <div>
-            <b>StartDate</b>
+            <label className={styles.headings}>Start Date</label><br></br>
             </div><br></br>
-            <DateTimePickerComponent onChange={this.handlestartDateChange} value={this.state.StartDate} max={this.state.MaximumDate} min={this.state.MinDate}></DateTimePickerComponent>
+            <DateTimePickerComponent onChange={this.handlestartDateChange} value={this.state.StartDate} max={this.state.MaximumDate} min={this.state.MinDate} ></DateTimePickerComponent>  
             <div>
-            <b>EndDate</b>
+            <label className={styles.headings}>End Date</label><br></br>
             </div><br></br>
             <div>
             
-          <DateTimePickerComponent onChange={this.handleEndDateChange} value={this.state.EndDate} max={this.state.MaximumDate} min={this.state.MinDate}></DateTimePickerComponent>
+          <DateTimePickerComponent onChange={this.handleEndDateChange} value={this.state.EndDate} max={this.state.MaximumDate} min={this.state.MinDate}></DateTimePickerComponent> 
+          <br></br>
           </div>
               
-            <br></br>
+          <br></br>
 
             <Stack horizontal tokens={sectionStackTokens}>
               <StackItem className={styles.commonstyle}>
-                <b><div>Number of Seats:</div></b><br></br>
+
+              <label className={styles.headings}>Number of Seats:</label><br></br>
+               
               </StackItem>
               <StackItem className={styles.commonstyle}>
               <Dropdown
@@ -1181,10 +1546,10 @@ private clear():void{
 
             <Stack horizontal tokens={sectionStackTokens}>
             <StackItem className={styles.commonstyle}>
-            <PrimaryButton text="Select" styles={stackButtonStyles} onClick={this.SelectSeats.bind(this)} className={styles.button} />
+            <PrimaryButton text="Previous" styles={stackButtonStyles}  onClick={this.OnBtnPrevClick.bind(this)} className={styles.button} />
             </StackItem>
             <StackItem className={styles.commonstyle}>
-            <PrimaryButton text="Previous" styles={stackButtonStyles} className={styles.button} onClick={this.OnBtnPrevClick.bind(this)} />
+            <PrimaryButton text="Next" styles={stackButtonStyles} className={styles.button} onClick={this.SelectSeats.bind(this)} />
              </StackItem><br></br>
              </Stack>
              </Stack>
@@ -1192,94 +1557,94 @@ private clear():void{
 
         }
 
-        {this.state.flag == true &&  this.state.Dispalygrid==true &&
-        <Stack horizontal tokens={sectionStackTokens}>
+        {this.state.flag == true && this.state.procflag ==true &&  this.state.Dispalygrid==true &&(this.state.UserLoginName || this.state.Userboolval) &&
 
-        <StackItem className={styles.commonstyle}>
-         <label>
-         Buliding Floor Plan
-         </label>
-        </StackItem><br></br>
+        <Stack>
 
-        <StackItem className={styles.commonstyle}>
+          
+        <Stack horizontal tokens={sectionStackTokens1}>
+
+         <StackItem className={styles.commonstyle}>
+        <label className={styles.headings}>Buliding Floor Plan :</label>
+       
         <Link href={this.state.LinkFloor} target="_blank" data-interception="off">{this.state.MyFloorType}</Link>
         </StackItem>
 
-        </Stack>
+</Stack> <br/>
 
-        }
+<Stack tokens={sectionStackTokens1}>
 
-        {this.state.flag == true && this.state.Dispalygrid==true &&
+  <StackItem>
 
-          // <Stack horizontal tokens={sectionStackTokens}>
-          // <StackItem className={styles.commonstyle}>
-          //   <b><div>Building Floor Plan</div></b><br></br>
-          // </StackItem>
-          // {/* <StackItem className={styles.commonstyle}>
-          //   <input type="text" name="No of seats" value={this.state.NoofSeats} onChange={this.changeTitle.bind(this)} />
-          // </StackItem> */}
-          //  </Stack>
+<label className={styles.headings}>Please select the desk(s) required</label>
 
-          // <Stack className={styles.commonstyle}>
-          // <b><div>Please select the desk(s) required</div></b><br></br>
-          <Stack horizontal className={styles.commonstyle}>
-           {/* <b><div id="divcontrols" dangerouslySetInnerHTML={{ __html: this.state.ConcString }}>
-           </div></b> */}
-           {this.state.chckboxesseats.map((item) =>(
-            <StackItem><input type="checkbox" name="chkseats1" value={item.seatId} disabled={item.seatTaken} onChange={this.changechbox.bind(this)} />{item.seatId}</StackItem>
-           ))}
-          </Stack>
+</StackItem>
 
-        }
+</Stack><br/>
 
+<Stack horizontal tokens={sectionStackTokens1} className={styles.MyStyling}>
 
-{this.state.flag == true && this.state.Dispalygrid==true &&
+ {this.state.chckboxesseats.map((item) =>(
 
-<Stack horizontal className={styles.commonstyle}>
-<StackItem className={styles.commonstyle}>
-         <label>
-         Desk Description of the Seat ID is below:
-         </label>
-        </StackItem><br></br>
+   <StackItem>
 
-        </Stack>
+  
+ <Checkbox value={item.seatId} disabled={item.seatTaken} name="chkseats1" label={item.seatId} onChange={this.changechbox.bind(this)} styles={item.seatTaken? checkboxstyles:checkboxstyles} className={item.seatTaken?styles.chkboxDeactive:styles.chkboxActive} >
 
-  }
+ </Checkbox>
+
+    
+    {/* <input type="checkbox" name="chkseats1" value={item.seatId} disabled={item.seatTaken} className={item.seatTaken? styles.redClass:styles.normalClass} onChange={this.changechbox.bind(this)} />{item.seatId} */}
+    
+    
+
+    </StackItem>
+
+ ))}
+
+</Stack><br/>
 
 
-{this.state.flag == true && this.state.Dispalygrid==true &&
+<Stack horizontal tokens={sectionStackTokens1}>
 
-<Stack horizontal className={styles.commonstyle}>
-<StackItem className={styles.commonstyle}>
-         <label>
-         {this.state.DeskDesc}
-         </label>
-        </StackItem><br></br>
+<Checkbox label="Selected Seat" className={styles.resevedSeats1} ></Checkbox>
 
-        </Stack>
+</Stack><br/>
 
+<Stack horizontal tokens={sectionStackTokens1}>
 
+<Checkbox label="Reserved Seat" className={styles.resevedSeats} ></Checkbox>
 
-  }
+</Stack><br/>
 
 
+<Stack horizontal tokens={sectionStackTokens1}>
 
+<Checkbox label="Empty Seat" className={styles.emptySeats} ></Checkbox>
 
+</Stack><br/>
 
-        {this.state.flag == true && this.state.Dispalygrid==true &&(this.state.UserLoginName || this.state.Userboolval) &&
+<Stack horizontal tokens={sectionStackTokens1}>
+<label className={styles.headings}>Desk Description of the Seat ID is below:</label>
+</Stack><br/>
+<Stack horizontal tokens={sectionStackTokens1}>
+{this.state.DeskDesc}
 
-          <Stack horizontal tokens={sectionStackTokens}>
+</Stack><br/><br/>
+
+<Stack horizontal tokens={sectionStackTokens}>
 
             <StackItem className={styles.coststyle}>
 
-            <input type="text" name="txtDeskID" value={this.state.deskId} onChange={this.changeDesk.bind(this)} />
+
+            <input type="text" name="txtDeskID" value={this.state.deskId} onChange={this.changeDesk.bind(this)}  placeholder="Enter Deskno"/>
 
             </StackItem>
             <StackItem className={styles.Serachtextbox} id="text">
 
               <PeoplePicker
                 context={this.props.context}
-                titleText="People Picker"
+                
                 personSelectionLimit={1}
                 showtooltip={true}
                 required={true}
@@ -1296,57 +1661,60 @@ private clear():void{
             </StackItem>
             <StackItem>
 
-            <PrimaryButton text="Add Rows" onClick={this.OnAddRowsClick.bind(this)} styles={stackButtonStyles} className={styles.button} />
+            <PrimaryButton text="Add" onClick={this.OnAddRowsClick.bind(this)} styles={stackButtonStyles} className={styles.button} />
             </StackItem>
 
           </Stack>
 
-        }
+</Stack>
 
-        {this.state.flag == true && this.state.GridUserValues && this.state.GridUserValues.length>0 && this.state.Dispalygrid==true &&
+}
+                   
+
+        {this.state.flag == true && this.state.procflag ==true && this.state.GridUserValues && this.state.GridUserValues.length>0 && this.state.Dispalygrid==true &&
 
           <Stack horizontal tokens={sectionStackTokens}>
 
            <Grid container className={styles.tableborder}>
 
-           <Grid item md={3}>
-              <header>
-                UserName
+           <Grid item md={4}>
+              <header className={styles.tablecell}>
+              Employee
               </header>
 
               {this.state.GridUserValues.map((Item,Index)=>(
-               <Paper>{Item.UserName}</Paper>
+               <Paper className={styles.tablecelldata1}>{Item.UserName}</Paper>
 
                ))}
 
             </Grid>
-            <Grid item md={3}>
-            <header>
+            <Grid item md={4}>
+            <header className={styles.tablecell}>
                 Email
               </header>
               {this.state.GridUserValues.map((Item,Index)=>(
-              <Paper>{Item.UserEmail}</Paper>
+              <Paper className={styles.tablecelldata1}>{Item.UserEmail}</Paper>
 
               ))}
             
             </Grid>
-            <Grid item md={3}>
-            <header>
+            <Grid item md={2}>
+            <header className={styles.tablecell}>
                 DeskId
               </header>
               {this.state.GridUserValues.map((Item,Index)=>(
-              <Paper>{Item.DeskId}</Paper>
+              <Paper className={styles.tablecelldata}>{Item.DeskId}</Paper>
 
               ))}
             </Grid>
-            <Grid item md={3}>
-            <header>
+            <Grid item md={2}>
+              <header className={styles.tablecell}>
                 Remove
               </header>
-              {this.state.GridUserValues.map((Item,Index)=>(
-              <Paper> <IconButton iconProps={{ iconName: "Delete" }} id={Item.DeskId}  className={styles.button} onClick={()=>this.onDeleteClick(Item)} /></Paper>
+            {this.state.GridUserValues.map((Item,Index)=>(
 
-              //<Paper><PrimaryButton text="Delete"   styles={stackButtonStyles} id={Item.DeskId}  className={styles.button} onClick={()=>this.onDeleteClick(Item)}/> </Paper>
+<Paper className={styles.tablecelldata}> <IconButton iconProps={{ iconName: "Delete" }} id={Item.DeskId}  className={styles.Iconbutton} onClick={()=>this.onDeleteClick(Item)} /></Paper>
+
 
               ))}
             </Grid>
@@ -1362,7 +1730,7 @@ private clear():void{
 
 
 
-{this.state.flag == true && this.state.GridUserValues && this.state.GridUserValues.length>0 && this.state.Dispalygrid==true &&
+{this.state.flag == true && this.state.procflag ==true && this.state.GridUserValues && this.state.GridUserValues.length>0 && this.state.Dispalygrid==true &&
 
 <Stack horizontal tokens={sectionStackTokens}>
   <StackItem>
