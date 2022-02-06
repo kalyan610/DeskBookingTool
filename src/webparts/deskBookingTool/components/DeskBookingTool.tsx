@@ -165,6 +165,7 @@ export interface IDeskBookingFieldsState {
   Exp:any;
   MyDays:any;
   Closekey:any;
+  //ChangeQuestions:any;
   QuestKey:any;
   isDisable:boolean;
   FirstDivVisble:boolean;
@@ -174,6 +175,7 @@ export interface IDeskBookingFieldsState {
 export default class DeskBookingTool extends React.Component<IDeskBookingToolProps, IDeskBookingFieldsState> {
 
   public _service: any;
+
   public GlobalService: any;
 
   protected ppl;
@@ -244,7 +246,7 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     this.getUserDetails();
 
-    alert('five');
+    alert('8');
     
     
 
@@ -360,7 +362,9 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     var myBuildingLocal: any = [];
 
-    var data = await this._service.MyGetBulidingData(SelLocVal);
+    this.GlobalService = new Service(this.props.url, this.props.context);
+
+    var data = await this.GlobalService.MyGetBulidingData(SelLocVal);
 
     var AllBuildings: any = [];
 
@@ -570,7 +574,9 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     var myFloorLocal: any = [];
 
-    var data = await this._service.MyGetFloorsData(LocaVal, BuildNamVal, BookingTypeval);
+    this.GlobalService = new Service(this.props.url, this.props.context);
+
+    var data = await this.GlobalService.MyGetFloorsData(LocaVal, BuildNamVal, BookingTypeval);
 
     var AllFloors: any = [];
 
@@ -952,6 +958,9 @@ export default class DeskBookingTool extends React.Component<IDeskBookingToolPro
 
     AllCheckedItems=[];
 
+     //Added Code
+
+     
 
 
   }
@@ -1273,7 +1282,7 @@ public ChangeExp=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGro
 
     });  
 
-    if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
+    if(option.key=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
     {
 
 
@@ -1305,7 +1314,7 @@ public ChangeExp=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGro
   
       });  
 
-      if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
+      if(this.state.Exp=='No' && option.key=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
       {
   
         this.setState({  
@@ -1335,7 +1344,7 @@ public ChangeExp=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGro
     
         });  
 
-        if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && this.state.QuestKey=='No')
+        if(this.state.Exp=='No' && this.state.MyDays=='No' && option.key=='No' && this.state.QuestKey=='No')
         {
     
           this.setState({  
@@ -1365,7 +1374,7 @@ public ChangeExp=async(ev: React.FormEvent<HTMLInputElement>, option: IChoiceGro
       
           });  
 
-          if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No')
+          if(this.state.Exp=='No' && this.state.MyDays=='No' && this.state.Closekey=='No' && option.key=='No')
           {
       
             this.setState({  
